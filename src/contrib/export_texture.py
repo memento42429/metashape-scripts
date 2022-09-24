@@ -37,7 +37,7 @@ def pathforsave(tex,img):   #def for save path and chooseing image type
         print("Image type error")
         Break
 
-    savePath = str("/".join(doc.path.split("/")[:-1]) + "/" + chunk.label + "_models/fromMS/" + chunk.label)
+    savePath = str("/".join(doc.path.split("/")[:-1]) + "/" + chunk.label + "_models/fromMS_textures/" + chunk.label)
     return savePath + a + b
 
 def texturetype(tex):   #def for choosing texture type

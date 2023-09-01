@@ -23,7 +23,7 @@ found_major_version = ".".join(Metashape.app.version.split('.')[:2])
 if found_major_version != compatible_major_version:
     raise Exception("Incompatible Metashape version: {} != {}".format(found_major_version, compatible_major_version))
 
-def createchunks(path):
+def createchunks(path, image_type = [".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"]):
     root = Path(path)
     print(root)
     abs_root = root.resolve()
@@ -39,11 +39,16 @@ def createchunks(path):
         if afolder.is_dir():
             chunk = doc.addChunk()
             chunk.label = afolder.name
-            list_images = list(Path(afolder).iterdir())
+            if type(image_type) is list:
+                list_images = list(Path(afolder).iterdir())
+                print(list_images)
+            else:
+                list_images = list(Path(afolder).glob('**/*'+image_type))
             photo_list = list()
             i = 0
             for photo in list_images:
-                if any((s in photo.suffix) for s in [".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"]):
+                #if any((s in photo.suffix) for s in [".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"]):
+                if any((s in photo.suffix.lower()) for s in image_type):
                     photo_list.append(fr'{photo.__str__()}')     # addPhoto method wants str list nither ospath
                     i = i+1
                 else:
@@ -59,10 +64,32 @@ def createchunks(path):
     Metashape.app.update()
 
 if __name__ == '__main__':
+    my_error = 0
     if len(sys.argv) == 1:
         print('YOU MUST ENTER THE PATH IN ARGV')
-        sys.exit
+        my_error = 1
 
     else: # The path images is made from sys.argv 
         path = str(sys.argv[1])
-        createchunks(path)
+        if len(sys.argv) == 3:
+            image_type = str(sys.argv[2]).lower()
+            if image_type[0] != '.':
+                image_type = '.' + image_type
+            else:
+                pass
+
+            if any((s in image_type) for s in [".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"]):
+                pass
+            else:
+                print(r'YOU SHOULD ENTER THE SUFFIX AMONG ".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"')
+                my_error = 2
+        else:
+            image_type = [".jpg", ".jpeg", ".tif", ".tiff", ".png", ".dng"]
+        
+    if my_error == 0:
+        print(path)
+        print(image_type)
+        createchunks(path,image_type)
+    
+    else:
+        print('error' + str(my_error))

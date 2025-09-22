@@ -18,7 +18,7 @@ You get new three chunks named "folder1", "folder2" and "folder3" when you imput
             --- folder3 --- image3-1, image3-2,,,,,
 """
 
-compatible_major_version = "1.8"
+compatible_major_version = "2.2"
 found_major_version = ".".join(Metashape.app.version.split('.')[:2])
 if found_major_version != compatible_major_version:
     raise Exception("Incompatible Metashape version: {} != {}".format(found_major_version, compatible_major_version))

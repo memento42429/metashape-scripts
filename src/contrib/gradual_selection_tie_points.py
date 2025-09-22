@@ -12,12 +12,14 @@ or
 leave the "Arguments" line blank, in which case the default values ​​will be used,
 which can also be modified in the script itself under the variables def_reperr, def_recunc, def_imgcount and def_projacc.
 When using, it is advisable to monitor the Console (View -> Console).
+
+20240327_change "Pointcloud" class to "TiePoints"
 """
 
 def_reperr = 1
 def_recunc = 15
-def_imgcount = 3
-def_projacc = 5
+def_imgcount = 2
+def_projacc = 50
 
 paramNo = len(sys.argv)
 
@@ -26,31 +28,32 @@ recunc = float(sys.argv[2] if paramNo == 5 else def_recunc)
 imgcount = float(sys.argv[3] if paramNo == 5 else def_imgcount)
 projacc = float(sys.argv[4] if paramNo == 5 else def_projacc)
 
+doc = Metashape.app.document
+chunks = doc.chunks
+f = Metashape.TiePoints.Filter()
 
-for chunk in Metashape.app.document.chunks:
-    f = Metashape.PointCloud.Filter()
-    f.init(chunk, Metashape.PointCloud.Filter.ReprojectionError)
-    f.removePoints(reperr)
+for chunk in chunks:
+	if chunk.enabled is True:
+		#Reprojection error
+		f.init(chunk, Metashape.TiePoints.Filter.ReprojectionError)
+		f.removePoints(reperr)
+		
+		#Reconstruction uncertainty
+		f.init(chunk, Metashape.TiePoints.Filter.ReconstructionUncertainty)
+		f.removePoints(recunc)
 
-for chunk in Metashape.app.document.chunks:
-    f = Metashape.PointCloud.Filter()
-    f.init(chunk, Metashape.PointCloud.Filter.ReconstructionUncertainty)
-    f.removePoints(recunc)
+		#Image counts
+		f.init(chunk, Metashape.TiePoints.Filter.ImageCount)
+		f.removePoints(imgcount)
 
-for chunk in Metashape.app.document.chunks:
-    f = Metashape.PointCloud.Filter()
-    f.init(chunk, Metashape.PointCloud.Filter.ImageCount)
-    f.removePoints(imgcount)
-
-for chunk in Metashape.app.document.chunks:
-    f = Metashape.PointCloud.Filter()
-    f.init(chunk, Metashape.PointCloud.Filter.ProjectionAccuracy)
-    f.removePoints(projacc)
+		#Projection accuracy
+		f.init(chunk, Metashape.TiePoints.Filter.ProjectionAccuracy)
+		f.removePoints(projacc)
 
 if paramNo == 5:
-    print("Number of entered arguments: " + str(paramNo - 1) + ". Used values:")
+	print("Number of entered arguments: " + str(paramNo - 1) + ". Used values:")
 else:
-    print("Number of entered arguments: " + str(paramNo - 1) + ". Default values were used:")
+	print("Number of entered arguments: " + str(paramNo - 1) + ". Default values were used:")
 
 print("ReprojectionError Level: ")
 print(reperr)

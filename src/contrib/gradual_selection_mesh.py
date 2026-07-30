@@ -11,7 +11,7 @@ This script scans the number of components in a model and reduceing them continu
 I wanted to make "grasdual selection" tool, but this is slower than that.
 """
 
-compatible_major_version = "2.2"
+compatible_major_version = "2.3"
 found_major_version = ".".join(Metashape.app.version.split('.')[:2])
 if found_major_version != compatible_major_version:
     raise Exception("Incompatible Metashape version: {} != {}".format(found_major_version, compatible_major_version))
@@ -28,6 +28,9 @@ def removeSmallComponents(model, faces_threshold):
 
 for chunk in chunks:
     if chunk.enabled is True:
+        if chunk.model is None:
+            print("Skipping chunk '{}': no model".format(chunk.label))
+            continue
         stats = chunk.model.statistics()
         print("Model has {} faces in {} components".format(stats.faces, stats.components))
         
